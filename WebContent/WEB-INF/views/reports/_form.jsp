@@ -5,12 +5,13 @@
     <div id="flush_error">
         入力内容にエラーがあります。<br />
         <c:forEach var="error" items="${errors}">
-            ·<c:out value="${error}" /><br />
+            ・<c:out value="${error}" /><br />
         </c:forEach>
+
     </div>
 </c:if>
 <label for="report_date">日付</label><br />
-<input type="date" name="report_date" value="<fmt:formatDate value='${report.report_date}' pattern='yyyy-MM-dd' />"/>
+<input type="date" name="report_date" value="<fmt:formatDate value='${report.report_date}' pattern='yyyy-MM-dd' />" />
 <br /><br />
 
 <label for="name">氏名</label><br />
