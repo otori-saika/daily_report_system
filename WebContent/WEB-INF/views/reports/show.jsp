@@ -4,6 +4,12 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <c:import url="/WEB-INF/views/layout/app.jsp">
     <c:param name="content">
+        <c:if test="${flush != null}">
+        <div id="flush_success">
+            <c:out value="${flush}"></c:out>
+        </div>
+        </c:if>
+
         <c:choose>
             <c:when test="${report != null}">
                 <h2>日報　詳細ページ</h2>
@@ -46,15 +52,25 @@
 
 
                 <%-- コメント入力フォーム --%>
-                <br /><form method="POST" action="<c:url value='/comments/create' />">
-                    <textarea name="comment" cols="45" placeholder="コメントを入力してください"></textarea>
+                <br />
+
+                <form style="display:inline-block" method="POST" action="<c:url value='/comments/create' />">
+                    <textarea name="comment" cols="45" placeholder="コメントを入力してください"></textarea>&nbsp;&nbsp;
                     <input type="hidden" name="report_id" value="${report.id}" />
                     <input type="hidden" name="_token" value="${_token}" />
                     <button type="submit">投稿</button>
-                </form><br />
+                </form>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+                <%-- いいねボタン --%>
+                <form method="POST" style="display:inline-block" action="<c:url value='/likes/create' />">
+                    <input type="hidden" name="report_id" value="${report.id}" />
+                    <input type="hidden" name="_token" value="${_token}" />
+                    <button id="btn1" style="display:inline-flex" type="submit" >いいね</button>
+                </form>&nbsp;<c:out value="${likes_count}" /><br />
+
 
                 <%-- コメント一覧表示 --%>
-
+               <br />
                <table id="comment">
                <c:forEach var="comment" items="${comments}">
                <tbody style="border: 1px solid #cccccc;">
@@ -65,22 +81,22 @@
                 <%-- コメント削除 --%>
                <c:if test="${sessionScope.login_employee.id == comment.employee.id}">
                    <a href="#" onclick="confirmDestroy();">削除</a>
-                   <form method="POST" action="/daily_report_system/comments/destroy">
-                       <input type="hidden" name="_token" value="${_token}" />
+                   <form method="POST" action="<c:url value='/comments/destroy' />">
                        <input type="hidden" name="report_id" value="${report.id}" />
                        <input type="hidden" name="comment_id" value="${comment.id}" />
+                       <input type="hidden" name="_token" value="${_token}" />
                    </form>
                    <script>
                    function confirmDestroy() {
                        if(confirm("本当に削除してよろしいですか？")) {
-                           document.forms[1].submit();
+                           document.forms[2].submit();
                        }
                    }
                    </script>
                </c:if></td>
-
-
                </tr>
+
+
                <tr style="border:none;">
                    <c:set var="a" value="\r\n" />
                    <c:set var="b" value="<br />" />

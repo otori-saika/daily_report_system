@@ -1,4 +1,4 @@
-package controllers.comments;
+package controllers.like;
 
 import java.io.IOException;
 
@@ -9,51 +9,51 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import models.Comment;
+import models.Employee;
+import models.Like;
 import models.Report;
 import utils.DBUtil;
 
 /**
- * Servlet implementation class CommentsDestroyServlet
+ * Servlet implementation class LikesCreateServlet
  */
-@WebServlet("/comments/destroy")
-public class CommentsDestroyServlet extends HttpServlet {
+@WebServlet("/likes/create")
+public class LikesCreateServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public CommentsDestroyServlet() {
+    public LikesCreateServlet() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
     /**
      * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String _token = request.getParameter("_token");
+        String _token = (String)request.getParameter("_token");
         if(_token != null && _token.equals(request.getSession().getId())) {
-
+          //データベースに接続↓
             EntityManager em = DBUtil.createEntityManager();
-
-            Report r = em.find(Report.class, Integer.parseInt(request.getParameter("report_id")));
-            request.setAttribute("report", r);
-
-            //該当のIDのコメント1件のみをデータベースから取得
-            Comment c = em.find(Comment.class, Integer.parseInt(request.getParameter("comment_id")));
-
             em.getTransaction().begin();
-            //削除
-            em.remove(c);
+
+            Like l = new Like();
+
+            Employee e = (Employee)request.getSession().getAttribute("login_employee");
+            l.setEmployee(e);
+            Report r = em.find(Report.class, Integer.parseInt(request.getParameter("report_id")));
+            l.setReport(r);
+
+            em.persist(l);
             em.getTransaction().commit();
             em.close();
-            request.getSession().setAttribute("flash", "削除が完了しました。");
+            request.getSession().setAttribute("flash", "いいねしました。");
 
 
 
-            //showページへリダイレクト
             response.sendRedirect(request.getContextPath() + "/reports/show?id=" + r.getId());
+
         }
     }
 

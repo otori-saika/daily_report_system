@@ -26,7 +26,23 @@ import javax.persistence.Table;
     @NamedQuery(
                 name = "getMyAllComments",
                 query = "SELECT c FROM Comment AS c WHERE c.report = :report ORDER BY c.id DESC"
-        )
+        ),
+    @NamedQuery(
+            name = "getMyComments",
+            query = "SELECT c FROM Comment AS c WHERE c.employee = :employee ORDER BY c.id DESC"
+            ),
+    @NamedQuery(
+            name = "getMyCommentsCount",
+            query = "SELECT COUNT (c) FROM Comment AS c WHERE c.employee = :employee ORDER BY c.id DESC"
+            ),
+    @NamedQuery(
+            name = "getOtherComments",
+            query = "SELECT c FROM Comment AS c WHERE c.report = ANY(SELECT r FROM Report AS r WHERE r.employee = :employee) ORDER BY c.id DESC"
+            ),
+    @NamedQuery(
+            name = "getOtherCommentsCount",
+            query = "SELECT COUNT (c) FROM Comment AS c WHERE c.report = ANY(SELECT r FROM Report AS r WHERE r.employee = :employee) ORDER BY c.id DESC"
+            )
 })
 @Table(name = "comments")
 public class Comment {

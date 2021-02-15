@@ -52,6 +52,11 @@ public class ReportShowServlet extends HttpServlet {
                 .setParameter("report", r)
                 .getSingleResult();
 
+        //いいね数を取得
+        long likes_count = (long)em.createNamedQuery("getLikesCount", Long.class)
+                .setParameter("report", r)
+                .getSingleResult();
+
 
         em.close();
 
@@ -60,7 +65,12 @@ public class ReportShowServlet extends HttpServlet {
         request.setAttribute("comments_count", comments_count);
         request.setAttribute("report", r);
         request.setAttribute("comments", comments);
+        request.setAttribute("likes_count", likes_count);
         request.setAttribute("_token", request.getSession().getId());
+        if(request.getSession().getAttribute("flush") != null) {
+            request.setAttribute("flush", request.getSession().getAttribute("flush"));
+            request.getSession().removeAttribute("flush");
+        }
 
 
         RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/reports/show.jsp");

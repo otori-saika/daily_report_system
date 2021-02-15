@@ -60,7 +60,7 @@ public class CommentsCreateServlet extends HttpServlet {
             em.persist(c);
             em.getTransaction().commit();
             em.close();
-
+            request.getSession().setAttribute("flash", "コメントが完了しました。");
 
             //show.jspにデータを渡して呼び出す
 
