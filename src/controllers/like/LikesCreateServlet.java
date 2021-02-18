@@ -3,6 +3,7 @@ package controllers.like;
 import java.io.IOException;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -36,7 +37,7 @@ public class LikesCreateServlet extends HttpServlet {
         if(_token != null && _token.equals(request.getSession().getId())) {
           //データベースに接続↓
             EntityManager em = DBUtil.createEntityManager();
-            em.getTransaction().begin();
+
 
             Like l = new Like();
 
@@ -44,17 +45,44 @@ public class LikesCreateServlet extends HttpServlet {
             l.setEmployee(e);
             Report r = em.find(Report.class, Integer.parseInt(request.getParameter("report_id")));
             l.setReport(r);
+            try{
+                Like c_l = em.createNamedQuery("checkLike", Like.class)
+                        .setParameter("e", e)
+                        .setParameter("r", r)
+                        .getSingleResult();
+                if(c_l != null) {
+                    em.getTransaction().begin();
+                    em.remove(c_l);
+                    em.getTransaction().commit();
+                    em.close();
+                    request.getSession().setAttribute("flush", "いいねを取り消しました。");
+                    response.sendRedirect(request.getContextPath() + "/reports/show?id=" + r.getId());
+                }
+                } catch(NoResultException ex) {
+                em.getTransaction().begin();
+                em.persist(l);
+                em.getTransaction().commit();
+                em.close();
+                request.getSession().setAttribute("flush", "いいねしました。");
 
-            em.persist(l);
-            em.getTransaction().commit();
-            em.close();
-            request.getSession().setAttribute("flash", "いいねしました。");
 
+                response.sendRedirect(request.getContextPath() + "/reports/show?id=" + r.getId());
 
-
-            response.sendRedirect(request.getContextPath() + "/reports/show?id=" + r.getId());
+            }
 
         }
-    }
+
+
+
+            }
 
 }
+
+
+
+
+
+
+
+
+

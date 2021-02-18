@@ -2,6 +2,7 @@ package controllers.comments;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.servlet.ServletException;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import models.Comment;
 import models.Employee;
 import models.Report;
+import models.validators.CommentVallidator;
 import utils.DBUtil;
 
 /**
@@ -38,7 +40,6 @@ public class CommentsCreateServlet extends HttpServlet {
         if(_token != null && _token.equals(request.getSession().getId())) {
             //データベースに接続↓
             EntityManager em = DBUtil.createEntityManager();
-            em.getTransaction().begin();
 
 
             Comment c = new Comment();
@@ -55,17 +56,32 @@ public class CommentsCreateServlet extends HttpServlet {
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             c.setCreated_at(currentTime);
 
+            List<String>errors = CommentVallidator.validate(c);
+            if(errors.size() > 0) {
+                em.close();
+
+                request.setAttribute("_token", request.getSession().getId());
+                request.setAttribute("comment", c);
+                request.getSession().setAttribute("errors", errors);
+                response.sendRedirect(request.getContextPath() + "/reports/show?id=" + r.getId());
+            } else {
+
+
+
 
             //データベースに保存
+            em.getTransaction().begin();
             em.persist(c);
             em.getTransaction().commit();
+            request.getSession().setAttribute("flush", "コメントが完了しました。");
+
             em.close();
-            request.getSession().setAttribute("flash", "コメントが完了しました。");
 
             //show.jspにデータを渡して呼び出す
 
             response.sendRedirect(request.getContextPath() + "/reports/show?id=" + r.getId());
             }
+        }
         }
 
     }

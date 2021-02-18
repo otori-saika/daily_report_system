@@ -38,6 +38,10 @@ import javax.persistence.Table;
     @NamedQuery(
             name = "getOtherLikesCount",
             query = "SELECT COUNT (l) FROM Like AS l WHERE l.report = ANY(SELECT r FROM Report AS r WHERE r.employee = :employee) ORDER BY l.id DESC"
+            ),
+    @NamedQuery(
+            name = "checkLike",
+            query = "SELECT l FROM Like AS l WHERE l.employee = :e AND l.report = :r"
             )
 })
 

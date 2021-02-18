@@ -4,9 +4,23 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <c:import url="/WEB-INF/views/layout/app.jsp">
     <c:param name="content">
+
+    <%-- フラッシュメッセージ --%>
+     <c:if test="${flush != null}">
         <c:if test="${flush != null}">
-        <div id="flush_success">
-            <c:out value="${flush}"></c:out>
+            <div id="flush_success">
+                <c:out value="${flush}"></c:out>
+            </div>
+        </c:if>
+
+    <%-- エラーメッセージ --%>
+     </c:if>
+        <c:if test="${errors != null}">
+        <div id="flush_error">
+        入力内容にエラーがあります。<br />
+        <c:forEach var="error" items="${errors}">
+            ・コメントを入力してください。<br />
+        </c:forEach>
         </div>
         </c:if>
 
@@ -62,18 +76,20 @@
                 </form>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
                 <%-- いいねボタン --%>
+                 <c:if test="${sessionScope.login_employee.id != report.employee.id}">
                 <form method="POST" style="display:inline-block" action="<c:url value='/likes/create' />">
                     <input type="hidden" name="report_id" value="${report.id}" />
                     <input type="hidden" name="_token" value="${_token}" />
                     <button id="btn1" style="display:inline-flex" type="submit" >いいね</button>
-                </form>&nbsp;<c:out value="${likes_count}" /><br />
-
+                </form>&nbsp;<c:out value="${likes_count}" />
+                </c:if>
+                <br />
 
                 <%-- コメント一覧表示 --%>
                <br />
                <table id="comment">
-               <c:forEach var="comment" items="${comments}">
-               <tbody style="border: 1px solid #cccccc;">
+                   <c:forEach var="comment" items="${comments}">
+                   <tbody style="border: 1px solid #cccccc;">
                <tr style="border:none;">
                    <td style="border:none;"><c:out value="${comment.employee.name}" />&nbsp;さん&nbsp;&nbsp;
                    ｜&nbsp;&nbsp;&nbsp;<fmt:formatDate value="${comment.created_at}" pattern="yyyy-MM-dd HH:mm" />&nbsp;&nbsp;&nbsp;
@@ -81,11 +97,11 @@
                 <%-- コメント削除 --%>
                <c:if test="${sessionScope.login_employee.id == comment.employee.id}">
                    <a href="#" onclick="confirmDestroy();">削除</a>
-                   <form method="POST" action="<c:url value='/comments/destroy' />">
-                       <input type="hidden" name="report_id" value="${report.id}" />
-                       <input type="hidden" name="comment_id" value="${comment.id}" />
-                       <input type="hidden" name="_token" value="${_token}" />
-                   </form>
+                       <form method="POST" action="<c:url value='/comments/destroy' />">
+                           <input type="hidden" name="report_id" value="${report.id}" />
+                           <input type="hidden" name="comment_id" value="${comment.id}" />
+                           <input type="hidden" name="_token" value="${_token}" />
+                       </form>
                    <script>
                    function confirmDestroy() {
                        if(confirm("本当に削除してよろしいですか？")) {
@@ -93,7 +109,8 @@
                        }
                    }
                    </script>
-               </c:if></td>
+               </c:if>
+               </td>
                </tr>
 
 

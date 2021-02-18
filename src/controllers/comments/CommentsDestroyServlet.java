@@ -48,7 +48,7 @@ public class CommentsDestroyServlet extends HttpServlet {
             em.remove(c);
             em.getTransaction().commit();
             em.close();
-            request.getSession().setAttribute("flash", "削除が完了しました。");
+            request.getSession().setAttribute("flush", "削除が完了しました。");
 
 
 
