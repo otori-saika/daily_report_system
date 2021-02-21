@@ -76,7 +76,7 @@
                 </form>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
                 <%-- いいねボタン --%>
-                 <c:if test="${sessionScope.login_employee.id != report.employee.id}">
+                <c:if test="${sessionScope.login_employee.id != report.employee.id}">
                 <form method="POST" style="display:inline-block" action="<c:url value='/likes/create' />">
                     <input type="hidden" name="report_id" value="${report.id}" />
                     <input type="hidden" name="_token" value="${_token}" />
@@ -88,42 +88,36 @@
                 <%-- コメント一覧表示 --%>
                <br />
                <table id="comment">
-                   <c:forEach var="comment" items="${comments}">
+                   <c:forEach  begin="0" end="4" step="1" varStatus="status" var="comment" items="${comments}">
                    <tbody style="border: 1px solid #cccccc;">
                <tr style="border:none;">
                    <td style="border:none;"><c:out value="${comment.employee.name}" />&nbsp;さん&nbsp;&nbsp;
                    ｜&nbsp;&nbsp;&nbsp;<fmt:formatDate value="${comment.created_at}" pattern="yyyy-MM-dd HH:mm" />&nbsp;&nbsp;&nbsp;
 
                 <%-- コメント削除 --%>
-               <c:if test="${sessionScope.login_employee.id == comment.employee.id}">
-                   <a href="#" onclick="confirmDestroy();">削除</a>
-                       <form method="POST" action="<c:url value='/comments/destroy' />">
+                 <c:if test="${sessionScope.login_employee.id == comment.employee.id}">
+                   <a href="#" onclick="confirmDestroy(${status.index});">削除</a>
+                       <form name="commentDestroy${status.index}" method="POST" action="<c:url value='/comments/destroy' />">
                            <input type="hidden" name="report_id" value="${report.id}" />
                            <input type="hidden" name="comment_id" value="${comment.id}" />
                            <input type="hidden" name="_token" value="${_token}" />
                        </form>
-                   <script>
-                   function confirmDestroy() {
-                       if(confirm("本当に削除してよろしいですか？")) {
-                           document.forms[2].submit();
-                       }
-                   }
-                   </script>
-               </c:if>
-               </td>
-               </tr>
-
-
+                   </c:if>
                <tr style="border:none;">
-                   <c:set var="a" value="\r\n" />
-                   <c:set var="b" value="<br />" />
-                   <c:set var="comments" value="${comment.comment}" />
-                   <td style="border:none;"><pre><c:out value="${comments}" /></pre></td>
+                   <td style="border:none;"><pre><c:out value="${comment.comment}" /></pre></td>
                </tr>
-
                </c:forEach>
                <tbody/>
                </table>
+                <script>
+                   function confirmDestroy(i) {
+                       if(confirm("本当に削除してよろしいですか？")) {
+                      var form = document.getElementsByName("commentDestroy" + i)[0];
+                      form.submit();
+                       }
+                   }
+                   </script>
+
             <div id="pagination">
                 (全 ${comments_count} 件) <br />
                 <c:forEach var="i" begin="1" end="${((comments_count - 1) / 5) + 1}" step="1">
